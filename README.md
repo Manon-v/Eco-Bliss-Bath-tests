@@ -1,40 +1,27 @@
-<div align="center">
+## Lancer les tests Cypress
 
-# OpenClassrooms - Eco-Bliss-Bath
-</div>
+Démarrer le backend et la base de données avec Docker. Dans un terminal ouvert à la racine du projet, démarrer le frontend :
 
-<p align="center">
-    <img src="https://img.shields.io/badge/MariaDB-v11.7.2-blue">
-    <img src="https://img.shields.io/badge/Symfony-v6.2-blue">
-    <img src="https://img.shields.io/badge/Angular-v13.3.0-blue">
-    <img src="https://img.shields.io/badge/docker--build-passing-brightgreen">
-  <br><br><br>
-</p>
-
-# Prérequis
-Pour démarrer cet applicatif web vous devez avoir les outils suivants:
-- Docker
-- NodeJs
-
-# Installation et démarrage
-Clonez le projet pour le récupérer
-``` 
-git clone https://github.com/OpenClassrooms-Student-Center/Eco-Bliss-Bath-V2.git
-cd Eco-Bliss-Bath-V2
-```
-Pour démarrer l'API avec ça base de données.
-```
-docker compose up -d
-```
-# Pour démarrer le frontend de l'applicatif
-Rendez-vous dans le dossier frontend
-```
-cd ./frontend
-```
-Installez les dépendances du projet
-```
-npm i
-ou
-npm install (si vous préférez)
+```powershell
+cd frontend
+npm start
 ```
 
+Laisser le serveur tourner. Dans un deuxième terminal, depuis le dossier `frontend`, ouvrir l’interface Cypress :
+
+```powershell
+npx cypress open
+```
+
+## Générer le rapport de la campagne principale
+
+Depuis le dossier `frontend`, exécuter les tests API, connexion, panier et smoke tests sur Edge :
+
+```powershell
+npx cypress run --browser edge --spec "cypress/e2e/api.cy.js,cypress/e2e/connexion.cy.js,cypress/e2e/panier.cy.js,cypress/e2e/smoke.cy.ts"
+```
+
+Mochawesome enregistre le rapport HTML dans `frontend/cypress/reports/index.html`.
+Le récapitulatif des résultats est également affiché à la fin de l’exécution dans le terminal.
+
+Le test d’ajout d’un produit en rupture échoue tant que l’API autorise cet ajout. L’anomalie est décrite dans le bilan de campagne.
