@@ -24,17 +24,14 @@ describe('Panier', () => {
     initialQuantity = undefined
     initialStock = undefined
 
-    cy.request('POST', `${api}/login`, {
-      username: 'test2@test.fr',
-      password: 'testtest'
-    }).then(({ body }) => {
-      token = body.token
+    cy.login().then((nouveauToken) => {
+    token = nouveauToken
 
-      lirePanier().then(({ body }) => {
-        const line = trouverLigne(body)
-        initialQuantity = line ? line.quantity : 0
-      })
-    })
+    lirePanier().then(({ body }) => {
+    const line = trouverLigne(body)
+    initialQuantity = line ? line.quantity : 0
+  })
+  })
 
     cy.intercept('GET', `${api}/products/${productId}`)
       .as('produit')
@@ -130,17 +127,20 @@ describe('Panier', () => {
         expect(line.quantity)
           .to.eq(initialQuantity + quantity)
 
-        cy.contains(
-          '[data-cy="cart-line"]',
-          'Poussière de lune'
-        )
-          .find('[data-cy="cart-line-quantity"]')
-          .should(
-            'have.value',
-            String(initialQuantity + quantity)
-          )
-      })
-
+     cy.get('[data-cy="cart-line"]')
+    .filter((index, element) => {
+    return Cypress.$(element)
+      .find('[data-cy="cart-line-name"]')
+      .text()
+      .toLowerCase()
+      .includes('lune')
+  })
+     .find('[data-cy="cart-line-quantity"]')
+    .should(
+    'have.value',
+    String(initialQuantity + quantity)
+  )
+})
       cy.visit(`${site}/#/products/${productId}`)
 
       cy.wait('@produit').then(({ response }) => {

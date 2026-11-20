@@ -11,7 +11,13 @@ export default defineConfig({
     inlineAssets: true,
   },
 
+  env: {
+    apiUrl: 'http://localhost:8081',
+  },
+
   e2e: {
+    baseUrl: 'http://localhost:4200',
+
     setupNodeEvents(on, config) {
       require('cypress-mochawesome-reporter/plugin')(on)
       return config

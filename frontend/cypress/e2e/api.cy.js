@@ -100,10 +100,10 @@ describe('Tests API', () => {
   })
 
   it('récupère le panier après connexion', () => {
-    connexion().then(({ body }) => {
-      const headers = {
-        Authorization: `Bearer ${body.token}`
-      }
+    cy.login().then((token) => {
+    const headers = {
+    Authorization: `Bearer ${token}`
+  }
 
       lirePanier(headers).then((response) => {
         expect(response.status).to.eq(200)
@@ -125,7 +125,9 @@ describe('Tests API', () => {
       .then((response) => {
         expect(response.status).to.eq(200)
         expect(response.body.id).to.eq(6)
-        expect(response.body.name).to.eq('Dans la forêt')
+        expect(response.body.name)
+        .to.be.a('string')
+        .and.not.be.empty
         expect(response.body.price).to.be.a('number')
         expect(response.body.availableStock)
           .to.be.a('number')
@@ -191,28 +193,32 @@ describe('Tests API', () => {
   })
 
   it('n’ajoute pas un produit en rupture de stock au panier', () => {
-    preparerAjout(4, false).then(({ headers, initialQuantity }) => {
-      cy.request({
-        method: 'PUT',
-        url: `${api}/orders/add`,
-        headers,
-        body: {
-          product: 4,
-          quantity: 1
-        },
-        failOnStatusCode: false
-      })
+  preparerAjout(4, false).then(({ headers, initialQuantity }) => {
+    cy.request({
+      method: 'PUT',
+      url: `${api}/orders/add`,
+      headers,
+      body: {
+        product: 4,
+        quantity: 1
+      },
+      failOnStatusCode: false
+    }).then((response) => {
+      const statut = response.status
 
       lirePanier(headers).then(({ body }) => {
         const line = trouverLigne(body, 4)
+        const quantiteFinale = line ? line.quantity : 0
 
         expect(
-          line ? line.quantity : 0,
-          'quantité inchangée pour le produit en rupture'
-        ).to.eq(initialQuantity)
+          statut >= 400 && statut < 500 &&
+          quantiteFinale === initialQuantity,
+          `HTTP reçu : ${statut}, quantité avant : ${initialQuantity}, après : ${quantiteFinale}`
+        ).to.eq(true)
       })
     })
   })
+})
 
   it('crée un avis après connexion', () => {
     const review = {

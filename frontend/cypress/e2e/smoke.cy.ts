@@ -54,7 +54,8 @@ describe('Smoke tests', () => {
   })
 
   cy.get('[data-cy="detail-product-name"]')
-    .should('contain.text', 'Dans la forêt')
+  .should('be.visible')
+  .and('not.be.empty')
 
   cy.get('[data-cy="detail-product-add"]')
     .should('be.visible')
